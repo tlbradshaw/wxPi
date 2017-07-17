@@ -207,6 +207,8 @@ def parsePacketv21(packet, wxData=None):
 		nm = 'THGR268'
 	elif sensor == '1D30':
 		nm = 'THGR968'
+	elif sensor == 'EC40':
+		nm = 'THGR268'		
 	else:
 		## Unknown - fail
 		return False, 'Invalid', -1, {}
