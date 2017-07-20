@@ -109,6 +109,24 @@ def _parseRGR968(data):
 	output['rainfall'] = rtotl
 	
 	return output
+	
+def _parsePCR122(data):
+	"""
+	Parse the data section of a PCR122 rain gauge packet and return a dictionary 
+	of the values recovered.
+	"""
+	
+	output = {'rainrate': -99, 'rainfall': -99}
+	
+	# Rainfall rate in mm/hr
+	rrate = int(data[0:3][::-1])/10.0
+	output['rainrate'] = rrate
+	
+	# Total rainfall in mm
+	rtotl = int(data[3:8][::-1])/10.0
+	output['rainfall'] = rtotl
+	
+	return output	
 
 def _parseWGR968(data):
 	"""
@@ -185,6 +203,7 @@ def parsePacketv21(packet, wxData=None):
 	  * 3D00 - WGR968  - Anemometer
 	  * 1D20 - THGR268 - Outdoor temperature/humidity
 	  * 1D30 - THGR968 - Outdoor temperature/humidity
+	  * EC40 - PCR122  - Rain guage
 	"""
 	
 	# Consolidate
@@ -208,7 +227,7 @@ def parsePacketv21(packet, wxData=None):
 	elif sensor == '1D30':
 		nm = 'THGR968'
 	elif sensor == 'EC40':
-		nm = 'THGR268'		
+		nm = 'PCR122'		
 	else:
 		## Unknown - fail
 		return False, 'Invalid', -1, {}
@@ -251,6 +270,8 @@ def parsePacketv21(packet, wxData=None):
 		output = _parseTHGR268(data)
 	elif nm == 'THGR968':
 		output = _parseTHGR968(data)
+	elif nm == 'PCR122':
+		output = _parsePCR122(data)
 	else:
 		return False, 'Invalid', -1, {}
 		
