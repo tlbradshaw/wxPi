@@ -8,6 +8,7 @@ import time
 import logging
 import threading
 import traceback
+import pprint
 try:
 	import cStringIO as StringIO
 except ImportError:
@@ -68,8 +69,10 @@ class PollingProcessor(threading.Thread):
 		sensorData = self.sensorData
 		
 		while self.alive.isSet():
+			# pollLogger.debug('Getting the time')
 			## Begin the loop
 			t0 = time.time()
+			pollLogger.debug('Initial time: ' +str(t0))
 			
 			## Load in the current configuration
 			wuID = self.config.get('Account', 'id')
@@ -85,13 +88,26 @@ class PollingProcessor(threading.Thread):
 			for i in xrange(self.loopsForState):
 				self.leds['red'].on()
 				tData = time.time() + int(round(duration-5))/2.0
-				packets = read433(radioPin, int(round(duration-5)))
+				pollLogger.debug('Listen for packets for: ' + str(tData))
+				try:
+					packets = read433(radioPin, int(round(duration-5)))
+				except:
+					pollLogger.debug('read433 error ')
+				pollLogger.debug('Packets: ' + pprint.PrettyPrinter(indent=4).pformat(packets) + str(len(packets)))
+				## ispackets = false	
+				## if packets is not None:
+				##	ispackets = true
+			
+				##  pollLogger.debug('Packets null? ' + str(ispackets))
+
 				self.leds['red'].off()
 				
 				## Process the received packets and update the internal state
 				self.leds['yellow'].on()
+				pollLogger.info('Reading packets...')
 				sensorData = parsePacketStream(packets, elevation=elevation, 
 												inputDataDict=sensorData)
+				pollLogger.info('Packets Read')
 				self.leds['yellow'].off()
 				
 				# Poll the BMP085/180 - if needed
@@ -122,13 +138,17 @@ class PollingProcessor(threading.Thread):
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 			self.leds['yellow'].off()
-			
+
+			pollLogger.debug('Attempting to add to WUnderground')
+			"""
+			pollLogger.debug('This shouldnt get printed')
 			## Post the results to WUnderground
 			if tData != tLastUpdate:
-				uploadStatus = wuUploader(wuID, wuPW, 
-											tData, sensorData, archive=self.db, 
-											includeIndoor=includeIndoor)
-											
+				# uploadStatus = wuUploader(wuID, wuPW, tData, sensorData, archive=self.db, includeIndoor=includeIndoor)
+				
+				uploadStatus = true
+				pollLogger.debug('Skipping the WU upload')
+
 				if uploadStatus:
 					tLastUpdate = 1.0*tData
 					
@@ -137,6 +157,7 @@ class PollingProcessor(threading.Thread):
 					time.sleep(3)
 					self.leds['green'].blink()
 				else:
+					tLastUpdate = 1.0*tData
 					pollLogger.error('Failed to post data to WUnderground')
 					self.leds['red'].blink()
 					time.sleep(3)
@@ -144,11 +165,16 @@ class PollingProcessor(threading.Thread):
 					
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
-				
+
+			"""	
+			pollLogger.debug('Attempting to sleep')
 			## Done
 			t1 = time.time()
 			tSleep = duration - (t1-t0)
-			tSleep = tSleep if tSleep > 0 else 0
+			pollLogger.debug('Times: t1, t0, tSleep, duration: ' + str(t1) + ', ' + str(t0) + ', ' + str(tSleep) + ', ' + str(duration))
+			## tSleep = tSleep if tSleep > 0 else 0
+			tSleep = 5
+			pollLogger.debug('Going to sleep for ' + str(tSleep) + ' seconds')
 			
 			## Sleep
 			time.sleep(tSleep)
