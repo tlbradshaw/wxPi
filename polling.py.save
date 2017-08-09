@@ -8,7 +8,6 @@ import time
 import logging
 import threading
 import traceback
-import pprint
 try:
 	import cStringIO as StringIO
 except ImportError:
@@ -69,10 +68,8 @@ class PollingProcessor(threading.Thread):
 		sensorData = self.sensorData
 		
 		while self.alive.isSet():
-			# pollLogger.debug('Getting the time')
 			## Begin the loop
 			t0 = time.time()
-			pollLogger.debug('Initial time: ' +str(t0))
 			
 			## Load in the current configuration
 			wuID = self.config.get('Account', 'id')
@@ -88,19 +85,8 @@ class PollingProcessor(threading.Thread):
 			for i in xrange(self.loopsForState):
 				self.leds['red'].on()
 				tData = time.time() + int(round(duration-5))/2.0
-				pollLogger.debug('Listen for packets for: ' + str(int(round(duration-5))))
-				try:
-					packets = read433(radioPin, int(round(duration-5)))
-				except:
-					pollLogger.debug('read433 error ')
-				pollLogger.debug('Packets: ' + pprint.PrettyPrinter(indent=4).pformat(packets) + str(len(packets)))
-				## ispackets = false	
-				## if packets is not None:
-				##	ispackets = true
-			
-				##  pollLogger.debug('Packets null? ' + str(ispackets))
-
-				self.leds['red'].off()
+				packets = read433(radioPin, int(round(duration-5)))
+				pollLogger.debug('Packets: "				self.leds['red'].off()
 				
 				## Process the received packets and update the internal state
 				self.leds['yellow'].on()
@@ -133,11 +119,8 @@ class PollingProcessor(threading.Thread):
 			## Check if there is anything to update in the archive
 			self.leds['yellow'].on()
 			if tData != tLastUpdate:
-                                if len(packets) > 0:
-                                    self.db.writeData(tData, sensorData)
-                                    pollLogger.info('Saving current state to archive')
-                                else:
-                                    pollLogger.debug('No data to save, so archiving skipped')
+				self.db.writeData(tData, sensorData)
+				pollLogger.info('Saving current state to archive')
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 			self.leds['yellow'].off()
@@ -174,7 +157,7 @@ class PollingProcessor(threading.Thread):
 			## Done
 			t1 = time.time()
 			tSleep = duration - (t1-t0)
-			##pollLogger.debug('Times: t1, t0, tSleep, duration: ' + str(t1) + ', ' + str(t0) + ', ' + str(tSleep) + ', ' + str(duration))
+			pollLogger.debug('Times: t1, t0, tSleep, duration: ' + str(t1) + ', ' + str(t0) + ', ' + str(tSleep) + ', ' + str(duration))
 			## tSleep = tSleep if tSleep > 0 else 0
 			tSleep = 5
 			pollLogger.debug('Going to sleep for ' + str(tSleep) + ' seconds')

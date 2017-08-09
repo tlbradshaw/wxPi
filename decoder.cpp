@@ -27,8 +27,8 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	struct sigaction sigact;
 	char message[512];
 	char messages[1024][512];
-	
-	verbose = 0;
+	printf("1 checking paramaters \n");
+	verbose = 1;
 	static char *kwlist[] = {"inputPin", "duration", NULL};
 	if( !PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &inputPin, &duration) ) {
 		PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
@@ -58,53 +58,80 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	// Go
 	Py_BEGIN_ALLOW_THREADS
 	
+	printf("2 checking if OokAvailable \n");
 	nMessage = 0;
 	tStart = (long) time(NULL);
-	while ((long) time(NULL) - tStart < duration && !do_exit) {
-		//// Check for a message
-		if ( rc->OokAvailable() ) {
-			rc->getOokCode(message);
+	try {
+	
+		while ((long) time(NULL) - tStart < duration && !do_exit) {
+			//// Check for a message
+			if ( rc->OokAvailable() ) {
+				rc->getOokCode(message);
 			
-			if( verbose ) {
-				cout << message << "\n" << flush;
+				if( verbose ) {
+					cout << message << "\n" << flush;
+				}
+			
+				if( strlen(message) < 10 ) {
+					cout << "Empty message" << "\n" << flush;
+					continue;
+				}
+
+				strcpy(messages[nMessage], message);
+				nMessage += 1;
+			
+
+				if( nMessage == 1024 ) {
+					duration = 0;
+				}
+			
 			}
-			
-			strcpy(messages[nMessage], message);
-			nMessage += 1;
-			
-			if( nMessage == 1024 ) {
-				duration = 0;
-			}
-			
+		
+			//// Wait a bit (~1 ms)
+			usleep(1000);
 		}
 		
-		//// Wait a bit (~1 ms)
-		usleep(1000);
+	}
+	catch (...){
+		PyErr_Format(PyExc_RuntimeError, "Error getting Ookmessage.");
+		printf("Error getting Ookmessage");			
+		return NULL;
 	}
 	
-	Py_END_ALLOW_THREADS
+		Py_END_ALLOW_THREADS
+
+		printf("3 disabling receiver \n");	
+		// Shutdown the receiver
+		rc->disableReceive();
+
+	try {
+		printf("4 looping through nmessage \n");
 	
-	// Shutdown the receiver
-	rc->disableReceive();
-	
-	// Setup the output list
-	bits = PyList_New(0);
-	for(i=0; i<nMessage; i++) {
-		strcpy(message, messages[i]);
-		
-		temp = PyString_FromString(message);
-		temp2 = PyObject_CallMethod(temp, "split", "(si)", " ", 1);
-		
-		temp2a = PyList_GetItem(temp2, (Py_ssize_t) 0);
-		temp2b = PyList_GetItem(temp2, (Py_ssize_t) 1);
-		temp3 = PyTuple_Pack((Py_ssize_t) 2, temp2a, temp2b);
-		PyList_Append(bits, temp3);
-		
-		Py_DECREF(temp);
-		Py_DECREF(temp2);
-		Py_DECREF(temp3);
+		// Setup the output list
+		bits = PyList_New(0);
+		for(i=0; i<nMessage; i++) {
+			strcpy(message, messages[i]);
+			
+			temp = PyString_FromString(message);
+			temp2 = PyObject_CallMethod(temp, "split", "(si)", " ", 1);
+			
+			temp2a = PyList_GetItem(temp2, (Py_ssize_t) 0);
+			temp2b = PyList_GetItem(temp2, (Py_ssize_t) 1);
+			temp3 = PyTuple_Pack((Py_ssize_t) 2, temp2a, temp2b);
+			PyList_Append(bits, temp3);
+			
+			Py_DECREF(temp);
+			Py_DECREF(temp2);
+			Py_DECREF(temp3);
+		}
+
 	}
-	
+	catch (...){
+		PyErr_Format(PyExc_RuntimeError, "Error setting up output from Ookmessage;");
+		printf("Error setting up output from Ookmessage");
+		return NULL;
+	}
+	printf("5 return output \n");
 	// Return
 	output = Py_BuildValue("O", bits);
 	return output;

@@ -219,6 +219,9 @@ def parsePacketv21(packet, wxData=None):
 	# Consolidate
 	packet = ''.join(packet)
 	
+	if len(packet) < 20: 
+		return False, 'Invalid', -1, {}
+	
 	# Check for a valid sync word.
 	if packet[0] != 'A':
 		return False, 'Invalid', -1, {}
