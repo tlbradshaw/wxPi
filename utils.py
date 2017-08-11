@@ -272,6 +272,8 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 	"""
 	Upload a collection of data to the WUnderground PWD service.
 	"""
+	utilsLogger.debug('Skipping WUnderground Loading')
+	return true
 	
 	# Wunderground PWS Base URL
 	PWS_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
@@ -325,19 +327,23 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 		
 	## Add in the rain values
 	if archive is not None:
-		### Ouch... there has to be a better way to do this
-		tUTCMidnight = (int(time.time()) / 86400) * 86400
-		localOffset = int(round(float(datetime.utcnow().strftime("%s.%f")) - time.time(), 1))
-		tLocalMidnight = tUTCMidnight + localOffset
-		if tLocalMidnight > time.time():
-			tLocalMidnight -= 86400
+		try:
+			### Ouch... there has to be a better way to do this
+			tUTCMidnight = (int(time.time()) / 86400) * 86400
+			localOffset = int(round(float(datetime.utcnow().strftime("%s.%f")) - time.time(), 1))
+			tLocalMidnight = tUTCMidnight + localOffset
+			if tLocalMidnight > time.time():
+				tLocalMidnight -= 86400
 			
-		### Get the rainfall from an hour ago and from local midnight
-		ts, entry = archive.getData(age=3630)
-		rainHour = entry['rainfall']
-		ts, entry  = archive.getData(age=time.time()-tLocalMidnight+30)
-		rainDay = entry['rainfall']
-		
+			### Get the rainfall from an hour ago and from local midnight
+			ts, entry = archive.getData(age=3630)
+			rainHour = entry['rainfall']
+			ts, entry  = archive.getData(age=time.time()-tLocalMidnight+30)
+			rainDay = entry['rainfall']
+		except Exception as e:
+			utilsLogger.warning('WUnderground PWS update failed: %s', str(e))
+			status = 'failed' 		
+
 		### Calculate
 		if rainHour >= 0 and rainDay >= 0:
 			try:

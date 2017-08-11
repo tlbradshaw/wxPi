@@ -99,34 +99,42 @@ def _parseRGR968(data):
 	"""
 	
 	output = {'rainrate': -99, 'rainfall': -99}
+
+	try:	
+		# Rainfall rate in mm/hr
+		rrate = int(data[0:3][::-1])/10.0
+		output['rainrate'] = rrate
 	
-	# Rainfall rate in mm/hr
-	rrate = int(data[0:3][::-1])/10.0
-	output['rainrate'] = rrate
-	
-	# Total rainfall in mm
-	rtotl = int(data[3:8][::-1])/10.0
-	output['rainfall'] = rtotl
-	
+		# Total rainfall in mm
+		rtotl = int(data[3:8][::-1])/10.0
+		output['rainfall'] = rtotl
+	except:
+		pass	
+
 	return output
 	
 def _parsePCR122(data):
 	"""
-	Parse the data section of a PCR122 rain gauge packet and return a dictionary 
+	Parse the data section of a PCR122 packet and return a dictionary 
 	of the values recovered.
 	"""
 	
-	output = {'rainrate': -99, 'rainfall': -99}
+	output = {'temperature': -99, 'humidity': -99}
 	
-	# Rainfall rate in mm/hr
-	rrate = int(data[0:3][::-1])/10.0
-	output['rainrate'] = rrate
+	# Temperature in C
+	temp = int(data[0:3][::-1])/10.0
+	if int(data[3]) != 0:
+		temp *= -1
+	output['temperature'] = temp
+		
+	# Relative humidity as a percentage
+	try:
+		humi = int(data[4:6][::-1])
+	except:
+		humi = -1
+	output['humidity'] = humi
 	
-	# Total rainfall in mm
-	rtotl = int(data[3:8][::-1])/10.0
-	output['rainfall'] = rtotl
-	
-	return output	
+	return output
 
 def _parseWGR968(data):
 	"""
@@ -161,7 +169,7 @@ def _parseTHGR268(data):
 	# Temperature in C
 	temp = int(data[0:3][::-1])/10.0
 	if int(data[3]) != 0:
-		temp *= -1
+		temp = -1
 	output['temperature'] = temp
 		
 	# Relative humidity as a percentage
@@ -177,17 +185,19 @@ def _parseTHGR968(data):
 	"""
 	
 	output = {'temperature': -99, 'humidity': -99}
-	
-	# Temperature in C
-	temp = int(data[0:3][::-1])/10.0
-	if int(data[3]) != 0:
-		temp *= -1
-	output['temperature'] = temp
+	try:
+		# Temperature in C
+		temp = int(data[0:3][::-1])/10.0
+		if int(data[3]) != 0:
+			temp *= -1
+		output['temperature'] = temp
 		
-	# Relative humidity as a percentage
-	humi = int(data[4:6][::-1])
-	output['humidity'] = humi
-	
+		# Relative humidity as a percentage
+		humi = int(data[4:6][::-1])
+		output['humidity'] = humi
+	except Exception as e:
+		parserLogger.error(str(e))
+		
 	return output
 	
 def parsePacketv21(packet, wxData=None):
@@ -203,7 +213,7 @@ def parsePacketv21(packet, wxData=None):
 	  * 3D00 - WGR968  - Anemometer
 	  * 1D20 - THGR268 - Outdoor temperature/humidity
 	  * 1D30 - THGR968 - Outdoor temperature/humidity
-	  * EC40 - PCR122  - Rain guage
+	  * EC40 - PCR122  - Outdoor temperature/humidity
 	"""
 	
 	# Consolidate
@@ -233,8 +243,8 @@ def parsePacketv21(packet, wxData=None):
 		return False, 'Invalid', -1, {}
 			
 	## Make sure there are enough bits that we get a checksum
-	#if len(packet) < ds+8:
-	#	return False, 'Invalid', -1, {}
+	if len(packet) < 20:
+		return False, 'Invalid', -1, {}
 		
 	# Report
 	parserLogger.debug("sync      %s", str(packet[ 0: 1]))
@@ -254,8 +264,8 @@ def parsePacketv21(packet, wxData=None):
 	parserLogger.debug("valid     %s", str(ccs[::-1] == packet[-4:-2]))
 	parserLogger.debug("----------")
 	
-	if packet[-4:-2] != ccs[::-1]:
-		return False, 'Invalid', -1, {}
+	#if packet[-4:-2] != ccs[::-1]:
+        #		return False, 'Invalid', -1, {}
 		
 	# Parse
 	data = packet[9:-4]
@@ -357,8 +367,9 @@ def parsePacketStream(packets, elevation=0.0, inputDataDict=None):
 
 if __name__ == "__main__":
 	# Testing
-	packets = [('OSV2', 'A1D201BB05710818544A'), 
+	packets = [('OSV2', 'AEC401E820320C33F000'), 
 	           ('OSV2', 'A1D3012200710618D2E0'), 
 	           ('OSV2', 'A3D000470712930730B3AE'), 
 	           ('OSV2', 'A5D600BB09220528CD83E6AF'),]
 	output = parsePacketStream(packets)
+	print output
