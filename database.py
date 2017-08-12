@@ -180,7 +180,7 @@ class Archive(object):
 			
 		# Convert it to the "standard" dictionary format
 		timestamp = row['dateTime']
-		output = {'temperature': row['outTemp1'], 'humidity': row['outHumidity1'], 
+		output = {'temperature': row['outTemp'], 'humidity': row['outHumidity'], 
 		          'dewpoint': row['outDewpoint'], 'windchill': row['windchill'], 
 		          'indoorTemperature': row['inTemp'], 'indoorHumidity': row['inHumidity'], 
 		          'indoorDewpoint': row['inDewpoint'], 'pressure': row['barometer'], 

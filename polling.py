@@ -107,6 +107,7 @@ class PollingProcessor(threading.Thread):
 				pollLogger.info('Reading packets...')
 				sensorData = parsePacketStream(packets, elevation=elevation, 
 												inputDataDict=sensorData)
+				pollLogger.debug(sensorData)
 				pollLogger.info('Packets Read')
 				self.leds['yellow'].off()
 				
@@ -143,14 +144,14 @@ class PollingProcessor(threading.Thread):
 			self.leds['yellow'].off()
 
 			pollLogger.debug('Attempting to add to WUnderground')
-			"""
-			pollLogger.debug('This shouldnt get printed')
+			
+			# pollLogger.debug('This shouldnt get printed')
 			## Post the results to WUnderground
 			if tData != tLastUpdate:
-				# uploadStatus = wuUploader(wuID, wuPW, tData, sensorData, archive=self.db, includeIndoor=includeIndoor)
+				uploadStatus = wuUploader(wuID, wuPW, tData, sensorData, archive=self.db, includeIndoor=includeIndoor)
 				
-				uploadStatus = true
-				pollLogger.debug('Skipping the WU upload')
+				# uploadStatus = true
+				# pollLogger.debug('Skipping the WU upload')
 
 				if uploadStatus:
 					tLastUpdate = 1.0*tData
@@ -169,7 +170,7 @@ class PollingProcessor(threading.Thread):
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 
-			"""	
+				
 			pollLogger.debug('Attempting to sleep')
 			## Done
 			t1 = time.time()

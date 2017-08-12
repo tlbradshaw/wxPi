@@ -272,8 +272,8 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 	"""
 	Upload a collection of data to the WUnderground PWD service.
 	"""
-	utilsLogger.debug('Skipping WUnderground Loading')
-	return true
+	# utilsLogger.debug('Skipping WUnderground Loading')
+        #return true
 	
 	# Wunderground PWS Base URL
 	PWS_BASE_URL = "http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
@@ -293,7 +293,7 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 	try:
 		pwsData['tempf'] = round(temp_C2F( sensorData['temperature'] ), 1)
 		pwsData['humidity'] = sensorData['humidity']
-		pwsData['dewptf'] = round(temp_C2F( sensorData['dewpoint'] ), 1)
+	#	pwsData['dewptf'] = round(temp_C2F( sensorData['dewpoint'] ), 1)
 	except KeyError:
 		pass
 	j = 2
@@ -305,9 +305,9 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 			pwsData['temp%if' % j] = round(temp_C2F( t ), 1)
 		except KeyError:
 			pass
-			
+	"""		
 	## Add in the barometric pressure
-	pwsData['baromin'] = round(pressure_mb2inHg( sensorData['pressure'] ), 2)
+	 pwsData['baromin'] = round(pressure_mb2inHg( sensorData['pressure'] ), 2)
 	
 	## Add in the wind values
 	try:
@@ -317,7 +317,7 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 		pwsData['windgustdir'] = sensorData['gustDirection']
 	except KeyError:
 		pass
-		
+	"""	
 	## Add in the UV index
 	try:
 		if sensorData['uvIndex'] >= 0:

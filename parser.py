@@ -343,7 +343,7 @@ def parsePacketStream(packets, elevation=0.0, inputDataDict=None):
 			### Multiplex the THGR268 values
 			for key in sensorData.keys():
 				if key in ('temperature', 'humidity', 'dewpoint'):
-					if sensorName == 'THGR968':
+					if sensorName in ('THGR968', 'PCR122'):
 						output[key] = sensorData[key]
 					else:
 						try:
