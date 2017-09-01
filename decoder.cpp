@@ -27,8 +27,7 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	struct sigaction sigact;
 	char message[512];
 	char messages[1024][512];
-	printf("1 checking paramaters \n");
-	verbose = 1;
+	verbose = 0;
 	static char *kwlist[] = {"inputPin", "duration", NULL};
 	if( !PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &inputPin, &duration) ) {
 		PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
@@ -58,7 +57,6 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	// Go
 	Py_BEGIN_ALLOW_THREADS
 	
-	printf("2 checking if OokAvailable \n");
 	nMessage = 0;
 	tStart = (long) time(NULL);
 	try {
@@ -100,13 +98,10 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	
 		Py_END_ALLOW_THREADS
 
-		printf("3 disabling receiver \n");	
 		// Shutdown the receiver
 		rc->disableReceive();
 
 	try {
-		printf("4 looping through nmessage \n");
-	
 		// Setup the output list
 		bits = PyList_New(0);
 		for(i=0; i<nMessage; i++) {
@@ -131,7 +126,7 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 		printf("Error setting up output from Ookmessage");
 		return NULL;
 	}
-	printf("5 return output \n");
+
 	// Return
 	output = Py_BuildValue("O", bits);
 	return output;

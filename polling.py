@@ -104,11 +104,10 @@ class PollingProcessor(threading.Thread):
 				
 				## Process the received packets and update the internal state
 				self.leds['yellow'].on()
-				pollLogger.info('Reading packets...')
 				sensorData = parsePacketStream(packets, elevation=elevation, 
 												inputDataDict=sensorData)
 				pollLogger.debug(sensorData)
-				pollLogger.info('Packets Read')
+			
 				self.leds['yellow'].off()
 				
 				# Poll the BMP085/180 - if needed

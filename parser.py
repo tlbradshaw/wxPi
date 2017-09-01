@@ -122,16 +122,19 @@ def _parsePCR122(data):
 	output = {'temperature': -99, 'humidity': -99}
 	
 	# Temperature in C
-	temp = int(data[0:3][::-1])/10.0
-	if int(data[3]) != 0:
-		temp *= -1
+	try:
+		temp = int(data[0:3][::-1])/10.0
+		if int(data[3]) != 0:
+			temp *= -1
+		# output['temperature'] = temp
+	except:
+		temp = -99
 	output['temperature'] = temp
-		
 	# Relative humidity as a percentage
 	try:
 		humi = int(data[4:6][::-1])
 	except:
-		humi = -1
+		humi = -99
 	output['humidity'] = humi
 	
 	return output
@@ -272,7 +275,10 @@ def parsePacketv21(packet, wxData=None):
 		
 	# Parse
 	data = packet[9:-4]
-	channel = int(packet[5])
+	try:
+		channel = int(packet[5])
+	except:
+		channel = -1
 	if nm == 'BHTR968':
 		output = _parseBHTR968(data)
 	elif nm == 'RGR968':
