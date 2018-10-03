@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from decoder import read433
 from parser import parsePacketStream
 from utils import computeDewPoint, computeSeaLevelPressure, wuUploader
-
+from mqtttest import writetoMQTT
 from sensors.bmpBackend import BMP085
 
 __version__ = "0.1"
@@ -118,17 +118,20 @@ class PollingProcessor(threading.Thread):
 			self.leds['yellow'].on()
 			if tData != tLastUpdate:
 				self.db.writeData(tData, sensorData)
-				pollLogger.info('Saving current state to archive')
+				pollLogger.info('Staving current state to archive')
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
+#			pollLogger.info('Did we get here?')
 			self.leds['yellow'].off()
-			
+			pollLogger.info('Posting data to WUnderground...')
 			## Post the results to WUnderground
 			if tData != tLastUpdate:
 				uploadStatus = wuUploader(wuID, wuPW, 
 											tData, sensorData, archive=self.db, 
 											includeIndoor=includeIndoor)
 											
+				writetoMQTT(sensorData)
+#				uploadStatus = True                                
 				if uploadStatus:
 					tLastUpdate = 1.0*tData
 					
@@ -145,11 +148,12 @@ class PollingProcessor(threading.Thread):
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 				
+			pollLogger.info('Calculating sleep time...')
 			## Done
 			t1 = time.time()
 			tSleep = duration - (t1-t0)
 			tSleep = tSleep if tSleep > 0 else 0
-			
+			pollLogger.info('going to sleep now...')			
 			## Sleep
 			time.sleep(tSleep)
 			

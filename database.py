@@ -264,6 +264,8 @@ class Archive(object):
 							cNames.append( "%s%i" % (nameBase, i+1) )
 							dValues.append( data[key][i] )
 							
+#		dbLogger.info('INSERT INTO wx (%s) VALUES (%s)' % (','.join(cNames), ','.join([str(v) for v in dValues])))
+
 		# Add the entry to the database
 		rid = self._backend.appendRequest('INSERT INTO wx (%s) VALUES (%s)' % (','.join(cNames), ','.join([str(v) for v in dValues])))
 		output = self._backend.getResponse(rid)

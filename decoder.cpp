@@ -28,7 +28,7 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	char message[512];
 	char messages[1024][512];
 	
-	verbose = 0;
+	verbose = 1;
 	static char *kwlist[] = {"inputPin", "duration", NULL};
 	if( !PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &inputPin, &duration) ) {
 		PyErr_Format(PyExc_RuntimeError, "Invalid parameters");

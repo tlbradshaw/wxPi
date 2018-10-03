@@ -111,7 +111,8 @@ def computeDewPoint(temp, humidity, degF=False):
 		
 		The returned dew point is in the same units as the input temperature.
 	"""
-
+	if humidity == -99:
+		return -99
 	# Move to Celsius, if needed
 	if degF:
 		temp = temp_F2C(temp)
@@ -305,8 +306,11 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 			pass
 			
 	## Add in the barometric pressure
-	pwsData['baromin'] = round(pressure_mb2inHg( sensorData['pressure'] ), 2)
-	
+	try:
+		pwsData['baromin'] = round(pressure_mb2inHg( sensorData['pressure'] ), 2)
+#	pwsData['baromin'] = 0
+	except KeyError:
+		pass
 	## Add in the wind values
 	try:
 		pwsData['windspeedmph'] = round(speed_ms2mph( sensorData['average'] ), 1)
@@ -363,6 +367,10 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 	# Post to Wunderground for the PWS protocol (if there is something 
 	# interesting to send)
 	status = False
+#	utilsLogger.debug('WUnderground PWS update status: %s', status)
+#	utilsLogger.debug('temp %f', pwsData['tempf'])
+	utilsLogger.debug('pwsData count: %d', len(pwsData.keys()))
+
 	if len(pwsData.keys()) > 4:
 		## Convert to a GET-safe string
 		pwsData = urllib.urlencode(pwsData)

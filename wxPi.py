@@ -309,7 +309,7 @@ def main(args):
 		fh.close()
 		
 	# CherryPy configuration
-	cherrypy.config.update({'server.socket_host': '0.0.0.0', 'environment': 'production'})
+	cherrypy.config.update({'server.socket_host': '0.0.0.0', 'server.host_socket': 8080, 'environment': 'production'})
 	cpConfig = {'/css': {'tools.staticdir.on': True,
 						 'tools.staticdir.dir': CSS_PATH},
           		'/js':  {'tools.staticdir.on': True,
@@ -346,6 +346,7 @@ def main(args):
 	# Start the sensor polling
 	bg = PollingProcessor(config, db, leds, buildState=buildState, loopsForState=loopsForState, sensorData=sensorData)
 	bg.start()
+	logger.info('Polling Started tlbrads.')
 	
 	# Initialize the web interface
 	ws = Interface(config, db, leds)

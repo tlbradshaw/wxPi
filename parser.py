@@ -99,15 +99,18 @@ def _parseRGR968(data):
 	"""
 	
 	output = {'rainrate': -99, 'rainfall': -99}
+
+	try:	
+		# Rainfall rate in mm/hr
+		rrate = int(data[0:3][::-1])/10.0
+		output['rainrate'] = rrate
 	
-	# Rainfall rate in mm/hr
-	rrate = int(data[0:3][::-1])/10.0
-	output['rainrate'] = rrate
-	
-	# Total rainfall in mm
-	rtotl = int(data[3:8][::-1])/10.0
-	output['rainfall'] = rtotl
-	
+		# Total rainfall in mm
+		rtotl = int(data[3:8][::-1])/10.0
+		output['rainfall'] = rtotl
+	except:
+		pass
+
 	return output
 	
 def _parsePCR122(data):
@@ -179,14 +182,20 @@ def _parseTHGR968(data):
 	output = {'temperature': -99, 'humidity': -99}
 	
 	# Temperature in C
-	temp = int(data[0:3][::-1])/10.0
-	if int(data[3]) != 0:
-		temp *= -1
-	output['temperature'] = temp
-		
+	try:
+		temp = int(data[0:3][::-1])/10.0
+		if int(data[3]) != 0:
+			temp *= -1
+		output['temperature'] = temp
+	except:
+		output['temperature'] = -99
+			
 	# Relative humidity as a percentage
-	humi = int(data[4:6][::-1])
-	output['humidity'] = humi
+	try:
+		humi = int(data[4:6][::-1])
+		output['humidity'] = humi
+	except:
+		output['humidity'] = -99
 	
 	return output
 	
@@ -227,7 +236,7 @@ def parsePacketv21(packet, wxData=None):
 	elif sensor == '1D30':
 		nm = 'THGR968'
 	elif sensor == 'EC40':
-		nm = 'PCR122'		
+		nm = 'THGR968'		
 	else:
 		## Unknown - fail
 		return False, 'Invalid', -1, {}
@@ -254,12 +263,15 @@ def parsePacketv21(packet, wxData=None):
 	parserLogger.debug("valid     %s", str(ccs[::-1] == packet[-4:-2]))
 	parserLogger.debug("----------")
 	
-	if packet[-4:-2] != ccs[::-1]:
-		return False, 'Invalid', -1, {}
+#	if packet[-4:-2] != ccs[::-1]:
+#		return False, 'Invalid', -1, {}
 		
 	# Parse
 	data = packet[9:-4]
-	channel = int(packet[5])
+	try:
+		channel = int(packet[5])
+	except:
+		channel = -99
 	if nm == 'BHTR968':
 		output = _parseBHTR968(data)
 	elif nm == 'RGR968':
@@ -293,7 +305,6 @@ def parsePacketStream(packets, elevation=0.0, inputDataDict=None):
 		The sea level corrected pressure is only compute if the elevation 
 		(in meters) is set to a non-zero value.  
 	"""
-
 	# Setup the output dictionary
 	output = {}
 	if inputDataDict is not None:
@@ -304,6 +315,7 @@ def parsePacketStream(packets, elevation=0.0, inputDataDict=None):
 	gspd = []
 	gdir = []
 	for pType,pPayload in packets:
+		parserLogger.debug(pType + ' ' + pPayload)
 		if pType == 'OSV2':
 			valid, sensorName, channel, sensorData = parsePacketv21(pPayload)
 		else:
