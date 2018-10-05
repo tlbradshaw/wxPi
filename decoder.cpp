@@ -25,10 +25,10 @@ static PyObject *read433(PyObject *self, PyObject *args, PyObject *kwds) {
 	PyObject *output, *bits, *temp, *temp2, *temp2a, *temp2b, *temp3;
 	long inputPin, duration, verbose, tStart, nMessage, i;
 	struct sigaction sigact;
-	char message[512];
-	char messages[1024][512];
+	char message[RCSWITCH_MAX_MESS_SIZE];
+	char messages[1024][RCSWITCH_MAX_MESS_SIZE];
 	
-	verbose = 1;
+	verbose = 0;
 	static char *kwlist[] = {"inputPin", "duration", NULL};
 	if( !PyArg_ParseTupleAndKeywords(args, kwds, "ii", kwlist, &inputPin, &duration) ) {
 		PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
