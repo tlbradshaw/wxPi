@@ -1,0 +1,9 @@
+INFO:__main__:Starting wxPi.py with PID 11263
+INFO:__main__:All dates and times are in UTC except where noted
+INFO:__main__:Loaded configuration from 'wxPi.config'
+INFO:__main__:Started the DatabaseProcessor background thread
+INFO:__main__:Started the PollingProcessor background thread
+INFO:__main__:Polling Started tlbrads.
+INFO:cherrypy.error:[07/Oct/2018:13:43:05] ENGINE Bus STARTING
+INFO:cherrypy.error:[07/Oct/2018:13:43:06] ENGINE Serving on http://0.0.0.0:8080
+INFO:cherrypy.error:[07/Oct/2018:13:43:06] ENGINE Bus STARTED

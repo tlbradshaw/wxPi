@@ -49,10 +49,22 @@ def writetoMQTT(data):
 		if data['temperature'] != -99:
 #		mqtt.publish('home-outside-temperature', data['temperature'])
 #		mqtt.publish('home-temperature', data['temperature']) 
-			aio.send('home-outside-temperature',data['temperature']*1.8 +32)
+			aio.send('home-outside-temperature', round(data['temperature']*1.8 +32, 2))
 			mqttLogger.debug('Message posted to MQTT.')
 		if data['humidity'] != -99:
 #		mqtt.publish('home-outside-humidity', data['humidity'])
 			aio.send('home-outside-humidity',data['humidity'])
+	except:
+		pass
+	try:
+		if data['rainfall'] != -99:
+			rainfall = round(data['rainfall']/25.4, 2)
+			aio.send('home-rainfall', rainfall)
+	except:
+		pass
+	try:
+		if data['rainrate'] != -99:
+			rainfall = round(data['rainrate']/25.4, 2)
+			aio.send('home-rainrate', rainfall)
 	except:
 		pass

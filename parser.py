@@ -104,7 +104,10 @@ def _parseRGR968(data):
 		# Rainfall rate in mm/hr
 		rrate = int(data[0:3][::-1])/10.0
 		output['rainrate'] = rrate
-	
+	except:
+		pass
+
+	try:	
 		# Total rainfall in mm
 		rtotl = int(data[3:8][::-1])/10.0
 		output['rainfall'] = rtotl

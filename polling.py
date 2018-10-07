@@ -27,6 +27,7 @@ __all__ = ["PollingProcessor", "__version__", "__all__"]
 # Logger instance
 pollLogger = logging.getLogger('__main__')
 
+logging.basicConfig(filename='wxpi_packets.log',level=logging.DEBUG)
 
 class PollingProcessor(threading.Thread):
 	"""
@@ -86,6 +87,7 @@ class PollingProcessor(threading.Thread):
 				self.leds['red'].on()
 				tData = time.time() + int(round(duration-5))/2.0
 				packets = read433(radioPin, int(round(duration-5)))
+				logging.debug(packets)
 				self.leds['red'].off()
 				
 				## Process the received packets and update the internal state
