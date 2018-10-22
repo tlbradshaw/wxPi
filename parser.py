@@ -291,7 +291,7 @@ def parsePacketv21(packet, wxData=None):
 		return False, 'Invalid', -1, {}
 		
 	# Report
-	parserLogger.debug("output    %s", str(output))
+#	parserLogger.debug("output    %s", str(output))
 	
 	# Return the packet validity, channel, and data dictionary
 	return True, nm, channel, output
@@ -318,7 +318,8 @@ def parsePacketStream(packets, elevation=0.0, inputDataDict=None):
 	gspd = []
 	gdir = []
 	for pType,pPayload in packets:
-		parserLogger.debug(pType + ' ' + pPayload)
+		parserLogger.info(pType + ' ' + pPayload)
+		#print(pType + ' ' + pPayload)
 		if pType == 'OSV2':
 			valid, sensorName, channel, sensorData = parsePacketv21(pPayload)
 		else:

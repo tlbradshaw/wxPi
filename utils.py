@@ -369,13 +369,13 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 	status = False
 #	utilsLogger.debug('WUnderground PWS update status: %s', status)
 #	utilsLogger.debug('temp %f', pwsData['tempf'])
-	utilsLogger.debug('pwsData count: %d', len(pwsData.keys()))
+#	utilsLogger.debug('pwsData count: %d', len(pwsData.keys()))
 
 	if len(pwsData.keys()) > 4:
 		## Convert to a GET-safe string
 		pwsData = urllib.urlencode(pwsData)
 		url = "%s?%s" % (PWS_BASE_URL, pwsData)
-		utilsLogger.info('WUnderground upload URL: %s', url)
+#		utilsLogger.info('WUnderground upload URL: %s', url)
 			
 		## Send
 		try:

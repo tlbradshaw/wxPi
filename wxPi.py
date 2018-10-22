@@ -292,7 +292,7 @@ def main(args):
 	
 	# Setup logging
 	logger = logging.getLogger(__name__)
-	logFormat = logging.Formatter('%(asctime)s [%(levelname)-8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+	logFormat = logging.Formatter('%(asctime)s %(name)s [%(levelname)-8s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 	logFormat.converter = time.gmtime
 	logHandler = WatchedFileHandler(cmdConfig['logfile'])
 	logHandler.setFormatter(logFormat)

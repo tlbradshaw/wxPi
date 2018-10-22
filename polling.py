@@ -27,7 +27,7 @@ __all__ = ["PollingProcessor", "__version__", "__all__"]
 # Logger instance
 pollLogger = logging.getLogger('__main__')
 
-logging.basicConfig(filename='wxpi_packets.log',level=logging.DEBUG)
+#logging.basicConfig(filename='wxpi_packets.log',level=logging.DEBUG)
 
 class PollingProcessor(threading.Thread):
 	"""
@@ -87,7 +87,7 @@ class PollingProcessor(threading.Thread):
 				self.leds['red'].on()
 				tData = time.time() + int(round(duration-5))/2.0
 				packets = read433(radioPin, int(round(duration-5)))
-				logging.debug(packets)
+			
 				self.leds['red'].off()
 				
 				## Process the received packets and update the internal state
@@ -125,7 +125,7 @@ class PollingProcessor(threading.Thread):
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 #			pollLogger.info('Did we get here?')
 			self.leds['yellow'].off()
-			pollLogger.info('Posting data to WUnderground...')
+#			pollLogger.info('Posting data to WUnderground...')
 			## Post the results to WUnderground
 			if tData != tLastUpdate:
 				uploadStatus = wuUploader(wuID, wuPW, 
@@ -150,12 +150,12 @@ class PollingProcessor(threading.Thread):
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 				
-			pollLogger.info('Calculating sleep time...')
+			#pollLogger.info('Calculating sleep time...')
 			## Done
 			t1 = time.time()
 			tSleep = duration - (t1-t0)
 			tSleep = tSleep if tSleep > 0 else 0
-			pollLogger.info('going to sleep now...')			
+			#pollLogger.info('going to sleep now...')			
 			## Sleep
 			time.sleep(tSleep)
 			
