@@ -336,11 +336,16 @@ def wuUploader(id, password, tData, sensorData, archive=None, includeIndoor=Fals
 		if tLocalMidnight > time.time():
 			tLocalMidnight -= 86400
 			
-		### Get the rainfall from an hour ago and from local midnight
-		ts, entry = archive.getData(age=3630)
-		rainHour = entry['rainfall']
-		ts, entry  = archive.getData(age=time.time()-tLocalMidnight+30)
-		rainDay = entry['rainfall']
+		try:
+			### Get the rainfall from an hour ago and from local midnight
+			ts, entry = archive.getData(age=3630)
+			rainHour = entry['rainfall']
+			ts, entry  = archive.getData(age=time.time()-tLocalMidnight+30)
+			rainDay = entry['rainfall']
+		except KeyError:
+			rainHour = -99
+			rainDay = -99
+			pass
 		
 		### Calculate
 		if rainHour >= 0 and rainDay >= 0:
