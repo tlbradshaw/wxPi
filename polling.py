@@ -150,7 +150,7 @@ class PollingProcessor(threading.Thread):
 			
 			#Lets reset the data after each sucessfull write.
 			for k, v in sensorData.Items():
-				sensorData[k] = '-99'
+				sensorData[k] = -99
 				
 			#pollLogger.info('Calculating sleep time...')
 			## Done
