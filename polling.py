@@ -147,6 +147,10 @@ class PollingProcessor(threading.Thread):
 					
 			else:
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
+			
+			#Lets reset the data after each sucessfull write.
+			for k, v in sensorData.Items():
+				sensorData[k] = '-99'
 				
 			#pollLogger.info('Calculating sleep time...')
 			## Done
