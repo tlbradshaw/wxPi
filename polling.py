@@ -125,13 +125,11 @@ class PollingProcessor(threading.Thread):
 				pollLogger.warning('Data timestamp has not changed since last poll, archiving skipped')
 #			pollLogger.info('Did we get here?')
 			self.leds['yellow'].off()
-#			pollLogger.info('Posting data to WUnderground...')
+			pollLogger.info('Posting data to WUnderground...')
 			## Post the results to WUnderground
 			if tData != tLastUpdate:
-				uploadStatus = wuUploader(wuID, wuPW, 
-											tData, sensorData, archive=self.db, 
-											includeIndoor=includeIndoor)
-											
+				uploadStatus = wuUploader(wuID, wuPW, tData, sensorData, archive=self.db, includeIndoor=includeIndoor)
+				pollLogger.info('Data posted to WUnderground...')
 				writetoMQTT(sensorData)
 #				uploadStatus = True                                
 				if uploadStatus:
