@@ -44,6 +44,7 @@ aio = Client('tlbradshaw','4551326023d44215bc73c6367ad1b8f0')
 
 
 def writetoMQTT(data):
+	mqttLogger.debug("The data sent to MQTT is:")
 	mqttLogger.debug(data)
 	try:
 		if data['temperature'] != -99:
@@ -54,7 +55,9 @@ def writetoMQTT(data):
 		if data['humidity'] != -99:
 #		mqtt.publish('home-outside-humidity', data['humidity'])
 			aio.send('home-outside-humidity',data['humidity'])
-	except:
+	except Exception as e:
+		mqttLogger.debug("Error in MQTT send")
+		mqttLogger.error(e, exc_info = True)
 		pass
 	try:
 		if data['rainfall'] != -99:
